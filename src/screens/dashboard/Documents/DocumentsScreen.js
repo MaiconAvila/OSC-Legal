@@ -11,7 +11,6 @@ import jwt from 'jsonwebtoken';
 import Header from '../components/Header';
 import Button from '../../../components/Button';
 import HeaderModal from '../components/HeaderModal';
-import Editor from './Editor';
 
 // Images
 import DocumentUser from '../../../assets/document-user.svg';
@@ -1176,7 +1175,6 @@ class DocumentsScreen extends Component {
 		isErrorDocClear: false,
 		templateList: [],
 		organizationUser: [],
-		isEdit: false,
 	};
 
 	componentDidMount() {
@@ -1207,6 +1205,8 @@ class DocumentsScreen extends Component {
 		try {
 			const token = await localStorage.getItem('token');
 
+			// const response = await createDocument(token);
+			console.log('response', response);
 			const response = await getAllDocuments(token);
 			console.log('response documents', response.data);
 			this.setState({
@@ -1223,23 +1223,23 @@ class DocumentsScreen extends Component {
 			const token = await localStorage.getItem('token');
 
 			const response = await createTemplate(templateData, token);
+
+			console.log('reponse', response);
 		} catch (error) {
-			console.log('error', error.response);
+			console.log('error', error);
 		}
 	}
 
 	deleteTemplate = async () => {
 		try {
-			const { templateId } = this.state.modelSelect;
+			const templateId  = this.state.modelSelect;
 
 			const token = await localStorage.getItem('token');
 
 			const response = await deleteTemplate(templateId, token);
 			console.log('response delete', response);
 
-			this.setState({
-				templateList: response.data,
-			});
+			console.log('response', response);
 
 			this.handleCancelDelete();
 		} catch (error) {
@@ -1252,10 +1252,10 @@ class DocumentsScreen extends Component {
 			const token = await localStorage.getItem('token');
 
 			const response = await getAllTemplates(token);
-
 			this.setState({
 				templateList: response.data,
 			});
+			
 		} catch (error) {
 			console.log('error', error.response);
 		}
@@ -1277,24 +1277,6 @@ class DocumentsScreen extends Component {
 			console.log('response', response);
 		} catch (error) {
 			console.log('erro', error);
-		}
-	}
-
-	handleDelete = async () => {
-		try {
-			const templateID = this.state.modelSelect.templateId;
-
-			const token = await localStorage.getItem('token');
-
-			console.log('id', templateID);
-			console.log('token', token);
-
-			const response = await deleteTemplate(templateID, token);
-			console.log('response', response);
-
-			this.handleCancelDelete();
-		} catch (error) {
-			console.log('error', error.response);
 		}
 	}
 
@@ -1583,7 +1565,6 @@ class DocumentsScreen extends Component {
 			const templateData = { description, template, templateName };
 			this.props.addNewDocument(templateData);
 			this.createTemplate(templateData);
-
 			this.setState({
 				templateData: {},
 				template: null,
@@ -1679,11 +1660,6 @@ class DocumentsScreen extends Component {
 		}
 	}
 
-	handleEdit = () => {
-		this.setState({
-			isEdit: true,
-		});
-	}
 
 	renderModalModels = () => {
 		const Messages = [
@@ -1976,7 +1952,7 @@ class DocumentsScreen extends Component {
 						{/* <Option
 							onMouseEnter={() => this.handleChangeColorEditUser(doc)}
 							onMouseLeave={this.handleChangeColorLeaveEdit}
-							onClick={this.handleEdit}
+							onClick={this.openEditor}
 						>
 							<OptionImage src={this.state.hoverEdit === doc ? this.state.downloadEdit : EditIcon} />
 							<OptionText
@@ -2168,7 +2144,6 @@ class DocumentsScreen extends Component {
 													/>
 												) : (
 													null))}
-										{this.state.isEdit && <Editor handleEdit={this.handleEdit} isEdit={this.state.isEdit}/>}
 										{this.state.addModel && this.renderModalModels()}
 										{this.state.modalDelete && this.renderModalDelete()}
 										{this.state.modalListDoc && this.renderModalListDoc()}
