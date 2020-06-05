@@ -1232,7 +1232,7 @@ class DocumentsScreen extends Component {
 
 	deleteTemplate = async () => {
 		try {
-			const templateId  = this.state.modelSelect;
+			const templateId = this.state.modelSelect;
 
 			const token = await localStorage.getItem('token');
 
