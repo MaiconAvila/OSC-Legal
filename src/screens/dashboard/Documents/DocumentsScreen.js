@@ -1973,7 +1973,7 @@ class DocumentsScreen extends Component {
 							</OptionText>
 						</Option>
 
-						<Option
+						{/* <Option
 							onMouseEnter={() => this.handleChangeColorEditUser(doc)}
 							onMouseLeave={this.handleChangeColorLeaveEdit}
 							onClick={this.handleEdit}
@@ -1985,7 +1985,7 @@ class DocumentsScreen extends Component {
 								<p>Editar</p>
 							</OptionText>
 
-						</Option>
+						</Option> */}
 						<Option
 							onMouseEnter={() => this.handleChangeColorDeleteUser(doc)}
 							onMouseLeave={this.handleChangeColorLeaveDelete}

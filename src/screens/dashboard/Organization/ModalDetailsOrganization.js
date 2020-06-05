@@ -554,7 +554,8 @@ class ModalDetailsOrganization extends Component {
 									</PaymentMethodText>
 								</ContainerPaymentMethod>))
 							: <ContainerEditImage>
-								<SpanContainerImage onClick={() => this.props.isModalCreateOrganization('edit')}>
+								<SpanContainerImage
+									onClick={() => this.props.isModalCreateOrganization('edit')}>
 									<ImageEdite src={ImageEdit} />
 									<ContainerOptionMobile>Editar</ContainerOptionMobile>
 								</SpanContainerImage>
