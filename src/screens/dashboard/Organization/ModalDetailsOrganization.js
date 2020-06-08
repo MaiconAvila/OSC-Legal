@@ -406,6 +406,14 @@ class ModalDetailsOrganization extends Component {
 		});
 	};
 
+	handleDateExpired = (createdIn) => {
+		const formateDate = createdIn.split('/');
+		const dateCreate = new Date(`${formateDate[1]}/${formateDate[0]}/${formateDate[2]}`);
+		const dateExpired =	dateCreate.setDate(dateCreate.getDate() + 30);
+		const date = new Date(dateExpired);
+
+		return `${date.getDate() <= 9 && `0${date.getDate()}`}/${date.getMonth() + 1 <= 9 && `0${date.getMonth() + 1}`}/${date.getFullYear()}`;
+	};
 
 	render() {
 		const { org, user } = this.props;
@@ -456,7 +464,7 @@ class ModalDetailsOrganization extends Component {
 										</div>
 										<div>
 											<SubTitle>vencimento</SubTitle>
-											<SubAnswer>{org.dueDate || '-'}</SubAnswer>
+											<SubAnswer>{this.handleDateExpired(org.createdIn) || '-'}</SubAnswer>
 										</div>
 									</ContentSubTitle>
 									{!this.props.isAdmin

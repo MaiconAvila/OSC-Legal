@@ -28,7 +28,6 @@ const Routes = () => (
 			<Route path='/newpassword' component={NewPassowrdScreen} />
 			<Route path='/createuser' component={CreateUserScreen} />
 
-			{/* <PrivateRoute path='/dashboard' component={Dashboard} /> */}
 			<Route path='/sucessfully' component={ModalSucessfully} />
 			<PrivateRoute path='/organizations' component={OrganizationScreen} />
 			<Route path='/documents' component={DocumentsScreen} />

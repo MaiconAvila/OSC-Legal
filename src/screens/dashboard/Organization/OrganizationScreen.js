@@ -513,10 +513,9 @@ const TableList = styled.td`
 	color: #404040;
 	font-family: "Overpass", Light;
 	font-size: 0.95rem;
-	font-weight: ${props => (props.font && '900')};
+	font-weight: ${props => (props.font && '600')};
 	text-align: ${props => (props.wNumber && 'center')};
 	padding: .25rem;
-	/* padding: 0.5%; */
 	cursor: pointer;
 
 	@media (max-width: 768px) {
@@ -840,7 +839,7 @@ class OrganizationScreen extends Component {
 		const dateExpired =	dateCreate.setDate(dateCreate.getDate() + 30);
 		const date = new Date(dateExpired);
 
-		return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+		return `${date.getDate() <= 9 && `0${date.getDate()}`}/${date.getMonth() + 1 <= 9 && `0${date.getMonth() + 1}`}/${date.getFullYear()}`;
 	};
 
 	deleteOrganization = async () => {
@@ -880,7 +879,7 @@ class OrganizationScreen extends Component {
 			await patchOrg(orgObj);
 			this.changeOrgStatus(newStatus, org);
 		} catch (error) {
-			console.log('error', error)
+			console.log('error', error);
 			this.setState({
 				error: 'Algo deu errado.',
 			});
@@ -1095,7 +1094,7 @@ class OrganizationScreen extends Component {
 
 		return listTable.map((item, index) => (
 			<Tr
-				style={{ margin: !isAdmin && index === listTable.length - 1 && '0 0 6rem 0' }}
+				style={{ margin: !isAdmin && index === listTable.length - 1 && '0 0 8rem 0' }}
 				key={index}
 			>
 				{widthMob
@@ -1261,6 +1260,7 @@ class OrganizationScreen extends Component {
 	}
 
 	render() {
+		console.log('this.props.tableDatas', this.props.tableDatas);
 		const { isAdmin, tableDatas } = this.props;
 		const {
 			isSelected,
@@ -1356,13 +1356,18 @@ class OrganizationScreen extends Component {
 									</tbody>
 								</Table>
 							</ContainerTable>
-							{this.renderAllTable().length === 0 && (
+							{this.props.tableDatas.length === 0 ? (
 								<TextNoOrganitazion>
-									{isAdmin
-										? <TextInformation>Não há organizações no momento.</TextInformation>
-										: <TextInformation>Essa organização não existe.</TextInformation>}
+									<TextInformation>Não há organizações no momento.</TextInformation>
 								</TextNoOrganitazion>
-							)}
+							)
+								: this.renderAllTable().length === 0 && (
+									<TextNoOrganitazion>
+										{isAdmin
+											? <TextInformation>Não há organizações no momento.</TextInformation>
+											: <TextInformation>Essa organização não existe.</TextInformation>}
+									</TextNoOrganitazion>
+								)}
 						</Content>
 					</ContainerTableUser>
 				</ContainerUser>

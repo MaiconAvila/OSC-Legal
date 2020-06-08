@@ -79,6 +79,8 @@ const Container = styled.form`
 	@media(max-width: 648px) {
 		width: 100%;
 		z-index: 10;
+		border-radius: 0;
+		border-top: 1px solid #707070;
 	}
 `;
 
@@ -115,6 +117,7 @@ const ContainerUser = styled.div`
 	padding-left: 3.7rem;
 	display: flex;
 	flex-flow: wrap column;
+
 	@media(max-width: 648px) {
 		padding-left: 2.5rem;
 	}
@@ -128,6 +131,7 @@ const UserTitle = styled.h2`
 	text-transform: uppercase;
 	font-family: Overpass;
 	font-weight: bold;
+
 	@media(max-width: 768px) {
 		font-size: .9rem;
 	}
@@ -146,14 +150,15 @@ const UserText = styled.p`
 `;
 
 const CreateOrgTitle = styled.h1`
-	color: #85144B;
 	align-self: flex-start;
+	color: #85144B;
 	font-family: "Overpass", sans-serif;
 	font-size: 2rem;
 	font-weight: 900;
 	padding: 0 3.5rem 2.5rem;
+
 	@media(max-width: 648px) {
-		padding-left: 2.5rem;
+		padding-left: 2rem;
 	}
 `;
 
@@ -175,21 +180,27 @@ const WrapOrganization = styled.div`
 
 const WrapOrganizationContent = styled.div`
 	display: flex;
+	padding-bottom: 2rem;
+`;
+
+const WrapOrganizationContent2 = styled.div`
+	display: flex;
 `;
 
 const WrapOrganizationItem = styled.div`
-	padding-bottom: 2rem;
 	width: 50%;
-	padding-bottom: 2rem;
+	/* padding-bottom: 2rem; */
 	display: flex;
 	flex-direction: column;
 `;
 
 const ContainerConcludeButton = styled.span`
+	width: 100%;
 	padding-left: 3rem;
 	padding-right: 3rem;
-	padding-bottom: 1.5rem;
-	width: 100%;
+	margin-top: 1.5rem;
+	/* padding-bottom: 1.5rem; */
+
 	@media(max-width: 648px) {
 		padding-left: 2rem;
     padding-right: 2rem;
@@ -211,6 +222,7 @@ const ContainerCreateOrg = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+
 	@media(max-width: 648px) {
 		padding-left: 2rem;
     padding-right: 2rem;
@@ -223,7 +235,21 @@ const ErrorMessage = styled.p`
   color: #f00;
   font-size: 0.8rem;
   font-weight: 400;
-	font-family: Overpass;
+	font-family: Overpass, Regular;
+
+  @media (max-width: 648px) {
+    margin: 0.5rem 0 0.8rem 0;
+  }
+`;
+
+const ErrorAllMessage = styled.p`
+  color: #f00;
+  font-size: 0.8rem;
+  font-weight: 400;
+	font-family: Overpass, Regular;
+	text-align: center;
+	margin-bottom: 0.5rem;
+
   @media (max-width: 648px) {
     margin: 0.5rem 0 0.8rem 0;
   }
@@ -289,8 +315,10 @@ class ModalCreateOrganization extends Component {
 			this.props.addNewOrg(org);
 		} catch (error) {
 			console.log('error', error.response);
+			const msgError = error.response.data.errors[0].message;
+
 			this.setState({
-				error: error.response.data.errors[0].message,
+				error: msgError,
 			});
 		}
 	}
@@ -436,7 +464,7 @@ class ModalCreateOrganization extends Component {
 		) {
 			const createDate = () => {
 				const date = new Date();
-				return `${date.getDay()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+				return `${date.getDate() <= 9 && `0${date.getDate()}`}/${date.getMonth() + 1 <= 9 && `0${date.getMonth() + 1}`}/${date.getFullYear()}`;
 			};
 
 			const org = {
@@ -677,6 +705,7 @@ class ModalCreateOrganization extends Component {
 													value={this.state.addressComplement}
 													name="addressComplement"
 													isError={isAddressComplementError}
+													required
 												/>
 												{isAddressComplementError && <ErrorMessage>{errorMessage[5]}</ErrorMessage>}
 											</WrapOrganizationItem>
@@ -695,7 +724,7 @@ class ModalCreateOrganization extends Component {
 												{isCityError && <ErrorMessage>{errorMessage[6]}</ErrorMessage>}
 											</WrapOrganizationItem>
 										</WrapOrganizationContent>
-										<WrapOrganizationContent>
+										<WrapOrganizationContent2>
 											<WrapOrganizationItem
 												style={{
 													marginRight: '1rem',
@@ -728,13 +757,14 @@ class ModalCreateOrganization extends Component {
 												/>
 												{isCepError && <ErrorMessage>{errorMessage[8]}</ErrorMessage>}
 											</WrapOrganizationItem>
-										</WrapOrganizationContent>
+										</WrapOrganizationContent2>
 									</WrapOrganization>
 								</ContainerCreateOrg>
 								<ContainerConcludeButton>
-									{error && <ErrorMessage>{error}</ErrorMessage>}
+									{error && <ErrorAllMessage>{error}</ErrorAllMessage>}
 									<Button
 										width={'100%'}
+										margin='0 0 2rem'
 										type="submit"
 										text="concluir"
 										textTransform

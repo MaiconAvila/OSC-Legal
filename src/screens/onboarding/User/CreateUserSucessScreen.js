@@ -1,8 +1,8 @@
 // Libs
-import React from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 // Components
 import ImageLogo from '../../../components/ImageLogo';
@@ -107,13 +107,17 @@ const TextTerms = styled.p`
 const TextTermsBold = styled.strong`
 	margin-left: 0.5rem;
 	text-decoration: underline;
-	cursor: pointer;
+	/* cursor: pointer; */
 `;
 
-const CreateUserSucessScreen = (props) => {
-	const userRegister = async () => {
+class CreateUserSucessScreen extends Component {
+	state = {
+		resendEmail: undefined,
+	};
+
+	resendEmail = async () => {
 		try {
-			const { users } = props.onboarding;
+			const { users } = this.props.onboarding;
 
 			const encodedPassword = OscHash(users.password);
 
@@ -127,41 +131,54 @@ const CreateUserSucessScreen = (props) => {
 			delete users.password;
 
 			await createUserAccount(users, base64credentials);
+
+			this.setState({
+				resendEmail: true,
+			});
 		} catch (error) {
 			console.log('err', error);
 			console.log('err.response', error.response);
 		}
 	};
 
-	return (
-		<Container>
-			<ImageLogo margin='5rem 0 3.5rem 0' displayMobile='none'/>
-			<Content>
-				<TitleTerms>Cadastro concluído com sucesso!</TitleTerms>
-				<SucessImage src={sucessImage} alt="sucess image" />
-				<TextTerms>
-					Enviamos um e-mail de confirmação para
-					<TextTermsBold>
-						{props.onboarding.users.email ? props.onboarding.users.email : 'nome@email.com'}
-					</TextTermsBold>. Verifique sua caixa de entrada para prosseguir.
-				</TextTerms>
-				<TextTerms>
-				Caso não tenha recebido a confirmação, clique em
-					<TextTermsBold onClick={userRegister}>Reenviar e-mail.</TextTermsBold>
-				</TextTerms>
-				<Link to="/">
-					<Button
-						width="85%"
-						height="3.8rem"
-						margin="2rem 0 1.5rem"
-						text="fazer login"
-						textTransform
-					/>
-				</Link>
-			</Content>
-		</Container>
-
-	);
-};
+	render() {
+		return (
+			<Container>
+				<ImageLogo margin='5rem 0 3.5rem 0' displayMobile='none'/>
+				<Content>
+					{this.state.resendEmail ? (
+						<TitleTerms>Reenviado com sucesso!</TitleTerms>
+					) : (
+						<TitleTerms>Cadastro concluído com sucesso!</TitleTerms>
+					)}
+					<SucessImage src={sucessImage} alt="sucess image" />
+					<TextTerms>
+						{this.state.resendEmail ? (
+							'Reenviado um e-mail de confirmação para'
+						) : (
+							'Enviamos um e-mail de confirmação para'
+						)}
+						<TextTermsBold>
+							{this.props.onboarding.users.email ? this.props.onboarding.users.email : 'nome@email.com'}
+						</TextTermsBold>. Verifique sua caixa de entrada para prosseguir.
+					</TextTerms>
+					<TextTerms>
+						Caso não tenha recebido a confirmação, clique em
+						<TextTermsBold onClick={this.resendEmail}>Reenviar e-mail.</TextTermsBold>
+					</TextTerms>
+					<Link to="/">
+						<Button
+							width="85%"
+							height="3.8rem"
+							margin="2rem 0 1.5rem"
+							text="fazer login"
+							textTransform
+						/>
+					</Link>
+				</Content>
+			</Container>
+		);
+	}
+}
 
 export default connect(mapStateToProps)(CreateUserSucessScreen);

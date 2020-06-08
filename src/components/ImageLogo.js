@@ -17,7 +17,7 @@ const LogoImage = styled.img`
 
 	@media(max-width: 648px) {
 		height: ${props => props.heightMobile};
-		padding-top: ${props => props.paddingMobile};
+		padding: ${props => props.paddingMobile};
 		margin: ${props => props.marginMobileSmall};
 		display: ${props => props.displayMobile};
 	}

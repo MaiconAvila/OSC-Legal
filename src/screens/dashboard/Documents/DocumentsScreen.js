@@ -38,6 +38,7 @@ import {
 	getAllOrganizations,
 	getAllDocuments,
 	createDocument,
+	// createDocumentUser,
 } from '../../../services/api';
 
 const mapStateToProps = state => ({
@@ -45,7 +46,7 @@ const mapStateToProps = state => ({
 	email: state.onboarding.users.email,
 	password: state.onboarding.users.password,
 	name: state.onboarding.users.name,
-	isAdmin: state.onboarding.users.isAdmin,
+	isAdmin: state.onboarding.user.isAdmin,
 	organization: state.organization.tableDatas,
 });
 
@@ -606,6 +607,7 @@ const Option = styled.button`
 `;
 
 const OptionImage = styled.img`
+	margin-bottom: 0.5rem;
 `;
 
 const OptionText = styled.span`
@@ -753,7 +755,7 @@ const UploadFile = styled.label`
 `;
 
 const TextUploadFile = styled.div`
-	width: 34%;
+	width: 36%;
 	display: flex;
 	flex-direction: column;
 	margin-left: 1rem;
@@ -808,7 +810,7 @@ const TextArea = styled.textarea`
 	height: 150px;
 	border-radius: 3px;
 	padding: 3% 2.5%;
-	margin-bottom: .5rem;
+	/* margin-bottom: .5rem; */
 	border: ${props => (props.isError === true ? '2px solid #F00' : '1px solid #FFCFCD')};
 	background: #FAFAFA;
 	font-size: 1rem;
@@ -1178,12 +1180,11 @@ class DocumentsScreen extends Component {
 	};
 
 	componentDidMount() {
-		this.renderTemplate();
+		this.getAllTemplates();
 		this.getAllOrgs();
 		this.getAllDocuments();
 		this.renderMobileButton();
 	}
-
 
 	getAllOrgs = async () => {
 		try {
@@ -1230,6 +1231,19 @@ class DocumentsScreen extends Component {
 		}
 	}
 
+	// createDocumentUser = async (templateData) => {
+	// 	try {
+	// 		console.log('template', templateData)
+	// 		const token = await localStorage.getItem('token');
+
+	// 		const response = await createDocumentUser(templateData, token);
+	// 		console.log('response createDocumentUser', response)
+	// 	} catch (error) {
+	// 		console.log('error', error.response);
+	// 	}
+	// }
+
+
 	deleteTemplate = async () => {
 		try {
 			const templateId = this.state.modelSelect;
@@ -1237,7 +1251,7 @@ class DocumentsScreen extends Component {
 			const token = await localStorage.getItem('token');
 
 			const response = await deleteTemplate(templateId, token);
-			console.log('response delete', response);
+			console.log('response delete', response)
 
 			console.log('response', response);
 
@@ -1247,7 +1261,7 @@ class DocumentsScreen extends Component {
 		}
 	}
 
-	renderTemplate = async () => {
+	getAllTemplates = async () => {
 		try {
 			const token = await localStorage.getItem('token');
 
@@ -1255,7 +1269,7 @@ class DocumentsScreen extends Component {
 			this.setState({
 				templateList: response.data,
 			});
-			
+
 		} catch (error) {
 			console.log('error', error.response);
 		}
@@ -1270,13 +1284,33 @@ class DocumentsScreen extends Component {
 			};
 			console.log(docs);
 
+			console.log('this.state.isSelected.template', this.state.isSelected)
+
+			// const token = await localStorage.getItem('token');
+
+			// const response = await createDocument(docs, token);
+
+			// console.log('response', response);
+		} catch (error) {
+			console.log('erro', error.response);
+		}
+	}
+
+	Template = async () => {
+		try {
+			const templateID = this.state.modelSelect.templateId;
+
 			const token = await localStorage.getItem('token');
 
-			const response = await createDocument(docs, token);
+			console.log('id', templateID);
+			console.log('token', token);
 
+			const response = await deleteTemplate(templateID, token);
 			console.log('response', response);
+
+			this.handleCancelDelete();
 		} catch (error) {
-			console.log('erro', error);
+			console.log('error', error.response);
 		}
 	}
 
@@ -1502,7 +1536,7 @@ class DocumentsScreen extends Component {
 		}
 	}
 
-	handleErrors = () => {
+	handleErrors = async () => {
 		const { templateName, description } = this.state.templateData;
 		const { template } = this.state;
 
@@ -1561,10 +1595,13 @@ class DocumentsScreen extends Component {
 				isErrorTitleQtd: false,
 			});
 		}
-		if (templateName !== '' && templateName.length > 4 && description !== '' && description.length <= 250 && template !== null) {
+		if (templateName !== '' && templateName.length >= 4 && description !== '' && description.length <= 250 && template !== null) {
 			const templateData = { description, template, templateName };
+
+			//Criando tamplate admin
+			await this.createTemplate(templateData);
 			this.props.addNewDocument(templateData);
-			this.createTemplate(templateData);
+
 			this.setState({
 				templateData: {},
 				template: null,
@@ -1652,8 +1689,8 @@ class DocumentsScreen extends Component {
 		});
 	}
 
-	delete = () => {
-		if (this.props.isAdmin === true) {
+	handleDeleteTemplate = () => {
+		if (this.props.isAdmin) {
 			this.deleteTemplate();
 		} else {
 			this.deleteUserDoc();
@@ -1776,7 +1813,7 @@ class DocumentsScreen extends Component {
 				<ButtonsModal>
 					<ButtonCancel onClick={this.handleCancelDelete}>Cancelar</ButtonCancel>
 					<Button
-						onClick={() => this.delete()}
+						onClick={() => this.handleDeleteTemplate()}
 						width="50%"
 						height="3.5rem"
 						text="Confirmar"
@@ -1816,7 +1853,7 @@ class DocumentsScreen extends Component {
 				</BoxModelsDoc>
 				{this.state.isErrorDoc && <ErrorText>Documento já adicionado</ErrorText>}
 				{this.state.isErrorDocClear && <ErrorText>Não há documento para ser escolhido</ErrorText>}
-				<ButtonModalList onClick={this.handleDocsUser}>Escolher</ButtonModalList>
+				<ButtonModalList onClick={this.handleDocsUser}>Escolher Um</ButtonModalList>
 			</Modal>
 		</ContainerModal>
 	)
@@ -1826,6 +1863,7 @@ class DocumentsScreen extends Component {
 			? this.state.templateList.filter(model => model.templateName.match(new RegExp(this.state.search, 'i')))
 			: this.state.templateList;
 		// MAP DOCUMENTS ADM
+		console.log('templateList', templateList)
 		return (
 			templateList && templateList.length > 0 ? (
 				templateList.map((doc, index) => (
@@ -1854,7 +1892,7 @@ class DocumentsScreen extends Component {
 								onMouseEnter={() => this.handleChangeColorExport(doc)}
 								onMouseLeave={this.handleChangeColorLeaveExport}
 							>
-								<OptionImage
+								<img
 									src={this.state.hoverExport === doc ? this.state.downloadExport : DownloadIcon}
 									alt="Exportar" />
 								<OptionText
@@ -1937,7 +1975,7 @@ class DocumentsScreen extends Component {
 							onMouseEnter={() => this.handleChangeColorExportUser(doc)}
 							onMouseLeave={this.handleChangeColorLeaveExport}
 						>
-							<OptionImage
+							<img
 								src={this.state.hoverExport === doc ? this.state.downloadExport : DownloadIcon}
 								alt="Exportar" />
 							<OptionText
@@ -1975,7 +2013,7 @@ class DocumentsScreen extends Component {
 									? this.state.colorTextDelete : '#85144B'}
 								onClick={() => this.userSelectedDoc(doc, index)}
 							>
-								<p>Excluir</p>
+								<p>Excluir Dois</p>
 							</OptionText>
 						</Option>
 					</ContainerOptions>
@@ -2003,6 +2041,7 @@ class DocumentsScreen extends Component {
 	)
 
 	render() {
+		console.log('templateList', this.state.templateList)
 		const { isAdmin } = this.props;
 		return (
 			<Container onClick={this.handleClickedLabelLeave || this.closeBoxOrgs}>
